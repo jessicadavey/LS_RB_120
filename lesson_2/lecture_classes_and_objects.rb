@@ -26,7 +26,7 @@
 # end
 
 
-# Now create a smart name= method that can take just a first name or a full name, and knows how to set the first_name and last_name appropriately.
+# 3. Now create a smart name= method that can take just a first name or a full name, and knows how to set the first_name and last_name appropriately.
 # Answer:
 class Person
   attr_accessor :first_name, :last_name
@@ -42,6 +42,10 @@ class Person
   def name=(name)
     split_name(name)
   end
+
+  def to_s
+    name
+  end
   
   private
   
@@ -54,3 +58,29 @@ class Person
 end
 
 
+# 4. Using the class definition from step #3, let's create a few more people -- that is, Person objects.
+# If we're trying to determine whether the two objects contain the same name, 
+# how can we compare the two objects?
+bob = Person.new('Robert Smith')
+rob = Person.new('Robert Smith')
+
+# Answer:
+p bob.name == rob.name
+
+# 5. Continuing with our Person class definition, what does the below print out?
+
+bob = Person.new("Robert Smith")
+puts "The person's name is: #{bob}"
+
+# Answer:
+# It will print out the (complicated!) name of the object, like this:
+# #<Person:0x0000560dc6ddfef8>
+
+# Let's add a to_s method to the class (see above):
+# Now, what does the below output?
+
+bob = Person.new("Robert Smith")
+puts "The person's name is: #{bob}"
+
+# Answer:
+# The person's name is Robert Smith.
