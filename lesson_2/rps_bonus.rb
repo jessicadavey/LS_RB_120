@@ -1,13 +1,11 @@
 class Score
   WIN_SCORE = 3
 
-  attr_reader :human, :computer, :human_name, :computer_name
+  attr_reader :human, :computer
 
-  def initialize(hmn, cptr)
+  def initialize
     @human = 0
     @computer = 0
-    @human_name = hmn
-    @computer_name = cptr
   end
 
   def reset
@@ -23,10 +21,10 @@ class Score
     end
   end
 
-  def display
+  def display(hum, comp)
     puts "Score:"
-    puts "#{human_name}: #{human}"
-    puts "#{computer_name}: #{computer}"
+    puts "#{hum}: #{human}"
+    puts "#{comp}: #{computer}"
   end
 
   private
@@ -123,7 +121,7 @@ class RPSGame
   def initialize
     @human = Human.new
     @computer = Computer.new
-    @score = Score.new(human, computer)
+    @score = Score.new
   end
 
   def display_welcome_message
@@ -189,7 +187,7 @@ class RPSGame
       display_moves
       display_winner
       score.update(human_won?, computer_won?)
-      score.display
+      score.display(human, computer)
       break if game_over?
     end
   end
