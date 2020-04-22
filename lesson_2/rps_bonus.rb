@@ -32,7 +32,6 @@ class Score
   private
 
   attr_writer :human, :computer
-
 end
 
 class Move
@@ -183,21 +182,25 @@ class RPSGame
     false
   end
 
+  def play_round
+    loop do
+      human.choose
+      computer.choose
+      display_moves
+      display_winner
+      score.update(human_won?, computer_won?)
+      score.display
+      break if game_over?
+    end
+  end
+
   def play
     display_welcome_message
     loop do
-      loop do
-        human.choose
-        computer.choose
-        display_moves
-        display_winner
-        score.update(human_won?, computer_won?)
-        score.display
-        break if game_over?
-      end
+      play_round
       display_grand_winner
       break unless play_again?
-        score.reset
+      score.reset
     end
     display_goodbye_message
   end
