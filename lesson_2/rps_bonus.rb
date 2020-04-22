@@ -1,3 +1,40 @@
+class Score
+  WIN_SCORE = 3
+
+  attr_reader :human, :computer, :human_name, :computer_name
+
+  def initialize(hmn, cptr)
+    @human = 0
+    @computer = 0
+    @human_name = hmn
+    @computer_name = cptr
+  end
+
+  def reset
+    @human = 0
+    @computer = 0
+  end
+
+  def update(human_won, computer_won)
+    if human_won
+      @human += 1
+    elsif computer_won
+      @computer += 1
+    end
+  end
+
+  def display
+    puts "Score:"
+    puts "#{human_name}: #{human}"
+    puts "#{computer_name}: #{computer}"
+  end
+
+  private
+
+  attr_writer :human, :computer
+
+end
+
 class Move
   VALUES = ['rock', 'paper', 'scissors']
 
@@ -84,21 +121,15 @@ end
 class RPSGame
   attr_accessor :human, :computer, :score
 
-  WIN_SCORE = 3
-
   def initialize
     @human = Human.new
     @computer = Computer.new
-    reset_score
-  end
-
-  def reset_score
-    @score = {human=>0, computer=>0}
+    @score = Score.new(human, computer)
   end
 
   def display_welcome_message
     puts "Welcome to Rock, Paper, Scissors!"
-    puts "First to #{WIN_SCORE} wins."
+    puts "First to #{Score::WIN_SCORE} wins."
   end
 
   def display_goodbye_message
@@ -128,29 +159,12 @@ class RPSGame
     end
   end
 
-  def update_score
-    if human_won?
-      score[human] += 1
-    elsif computer_won?
-      score[computer] += 1
-    end
-  end
-
-  def display_score
-    puts "Score:"
-    score.each_pair do |player, value|
-      puts "#{player}: #{value}"
-    end
-  end
-
   def game_over?
-    score.values.any? do |value|
-      value >= WIN_SCORE
-    end
+    score.human >= Score::WIN_SCORE || score.computer >= Score::WIN_SCORE
   end
 
   def display_grand_winner
-    if score[human] >= WIN_SCORE
+    if score.human >= Score::WIN_SCORE
       puts "#{human} is the winner!"
     else
       puts "#{computer} is the winner!"
@@ -177,13 +191,13 @@ class RPSGame
         computer.choose
         display_moves
         display_winner
-        update_score
-        display_score
+        score.update(human_won?, computer_won?)
+        score.display
         break if game_over?
       end
       display_grand_winner
       break unless play_again?
-        reset_score
+        score.reset
     end
     display_goodbye_message
   end
