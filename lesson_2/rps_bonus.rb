@@ -84,14 +84,21 @@ end
 class RPSGame
   attr_accessor :human, :computer, :score
 
+  WIN_SCORE = 3
+
   def initialize
     @human = Human.new
     @computer = Computer.new
+    reset_score
+  end
+
+  def reset_score
     @score = {human=>0, computer=>0}
   end
 
   def display_welcome_message
     puts "Welcome to Rock, Paper, Scissors!"
+    puts "First to #{WIN_SCORE} wins."
   end
 
   def display_goodbye_message
@@ -138,12 +145,12 @@ class RPSGame
 
   def game_over?
     score.values.any? do |value|
-      value >= 3
+      value >= WIN_SCORE
     end
   end
 
   def display_grand_winner
-    if score[human] >= 3
+    if score[human] >= WIN_SCORE
       puts "#{human} is the winner!"
     else
       puts "#{computer} is the winner!"
@@ -158,7 +165,6 @@ class RPSGame
       break if ['y', 'n'].include? answer.downcase
       puts "Sorry, must be y or n."
     end
-
     return true if answer == 'y'
     false
   end
@@ -166,16 +172,19 @@ class RPSGame
   def play
     display_welcome_message
     loop do
-      human.choose
-      computer.choose
-      display_moves
-      display_winner
-      update_score
-      display_score
-      break if game_over?
-      # break unless play_again?
+      loop do
+        human.choose
+        computer.choose
+        display_moves
+        display_winner
+        update_score
+        display_score
+        break if game_over?
+      end
+      display_grand_winner
+      break unless play_again?
+        reset_score
     end
-    display_grand_winner
     display_goodbye_message
   end
 end
