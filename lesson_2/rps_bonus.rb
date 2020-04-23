@@ -56,10 +56,11 @@ class Move
 end
 
 class Player
-  attr_accessor :move, :name
+  attr_accessor :move, :name, :history
 
   def initialize
     set_name
+    @history = []
   end
 
   def to_s
@@ -125,6 +126,11 @@ class RPSGame
     puts "#{computer} chose #{computer.move}."
   end
 
+  def update_history
+    human.history << human.move.to_s
+    computer.history << computer.move.to_s
+  end
+
   def human_won?
     human.move > computer.move
   end
@@ -142,11 +148,27 @@ class RPSGame
       puts "It's a tie!"
     end
   end
-  
+
   def display_scores
     puts "Score:"
     puts "#{human}: #{score.human}"
     puts "#{computer}: #{score.computer}"
+  end
+
+  def format_history(moves, name)
+    history = ""
+
+    moves.each_with_index do |move, i|
+      history.prepend(" #{i + 1}: #{move}")
+    end
+
+    history.prepend("#{name} >>")
+  end
+
+  def display_history
+    puts "History:"
+    puts format_history(human.history, human.name)
+    puts format_history(computer.history, computer.name)
   end
 
   def game_over?
@@ -173,14 +195,20 @@ class RPSGame
     false
   end
 
+  def display_results
+    display_winner
+    display_scores
+    display_history
+  end
+
   def play_round
     loop do
       human.choose
       computer.choose
       display_moves
-      display_winner
+      update_history
       score.update(human_won?, computer_won?)
-      display_scores
+      display_results
       break if game_over?
     end
   end
