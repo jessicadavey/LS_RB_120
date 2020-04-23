@@ -35,30 +35,30 @@ class Score
 end
 
 class Move
-  BEATS = { 'rock' => %w(scissors lizard),
-            'paper' => %w(rock spock),
-            'scissors' => %w(lizard paper),
-            'lizard' => %w(paper spock),
-            'spock' => %w(rock scissors) }
+  WIN_CONDITIONS = { 'rock' => %w(scissors lizard),
+                     'paper' => %w(rock spock),
+                     'scissors' => %w(lizard paper),
+                     'lizard' => %w(paper spock),
+                     'spock' => %w(rock scissors) }
 
-  VALUES = ['rock', 'paper', 'scissors', 'lizard', 'spock']
+  VALUES = WIN_CONDITIONS.keys
 
   def initialize(value)
     @value = value
   end
 
   def >(other_move)
-    BEATS[@value].include?(other_move.to_s)
+    WIN_CONDITIONS[@value].include?(other_move.to_s)
   end
 
   def <(other_move)
-    !BEATS[@value].include?(other_move.to_s) && @value != other_move.to_s
+    !WIN_CONDITIONS[@value].include?(other_move.to_s) &&
+      @value != other_move.to_s
   end
 
   def to_s
     @value
   end
-
 end
 
 class Player
