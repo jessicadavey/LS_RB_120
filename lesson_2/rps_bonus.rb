@@ -23,12 +23,6 @@ class Score
     end
   end
 
-  def display(hum, comp)
-    puts "Score:"
-    puts "#{hum}: #{human}"
-    puts "#{comp}: #{computer}"
-  end
-
   private
 
   attr_writer :human, :computer
@@ -148,6 +142,12 @@ class RPSGame
       puts "It's a tie!"
     end
   end
+  
+  def display_scores
+    puts "Score:"
+    puts "#{human}: #{score.human}"
+    puts "#{computer}: #{score.computer}"
+  end
 
   def game_over?
     score.human >= Score::WIN_SCORE || score.computer >= Score::WIN_SCORE
@@ -180,7 +180,7 @@ class RPSGame
       display_moves
       display_winner
       score.update(human_won?, computer_won?)
-      score.display(human, computer)
+      display_scores
       break if game_over?
     end
   end
