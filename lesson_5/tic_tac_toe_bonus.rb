@@ -1,4 +1,8 @@
+require 'pry'
+
 class Board
+  attr_reader :squares
+
   WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
                   [[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # cols
                   [[1, 5, 9], [3, 5, 7]]              # diagonals
@@ -87,15 +91,15 @@ end
 
 class Player
   attr_reader :marker
+  attr_accessor :name
 
-  def initialize(type)
-    if type == :computer
-      @marker = "O"
-    end
+  def initialize(type = nil)
+    @marker = "O" if type == 'computer'
   end
 
   def choose_marker
     choice = nil
+    puts "Welcome #{name}!"
     loop do
       puts "Please type a character (not a space or O) to use as a marker."
       choice = gets.chomp
@@ -104,7 +108,6 @@ class Player
     end
     @marker = choice
   end
-
 end
 
 class TTTGame
@@ -112,8 +115,20 @@ class TTTGame
 
   def initialize
     @board = Board.new
-    @human = Player.new(:human)
-    @computer = Player.new(:computer)
+    @human = Player.new
+    @computer = Player.new('computer')
+  end
+
+  def set_names
+    n = ""
+    loop do
+      puts "What is your name?"
+      n = gets.chomp
+      break unless n.empty?
+      puts "You must enter a name."
+    end
+    human.name = n
+    computer.name = "C-3PO"
   end
 
   def set_first_player
@@ -130,6 +145,7 @@ class TTTGame
   def play
     clear
     display_welcome_message
+    set_names
     human.choose_marker
     set_first_player
     loop do
@@ -171,7 +187,8 @@ class TTTGame
   end
 
   def display_board
-    puts "You're a #{human.marker}.  Computer is a #{computer.marker}."
+    puts "#{human.name} is a #{human.marker}. "\
+         "#{computer.name} is a #{computer.marker}."
     puts ""
     board.draw
     puts ""
@@ -188,8 +205,38 @@ class TTTGame
     board[square] = human.marker
   end
 
+  def square_to_attack
+    Board::WINNING_LINES.each do |line|
+      marks = board.squares.values_at(*line).map(&:marker)
+      if marks.count(computer.marker) == 2 && marks.count(Square::INITIAL_MARKER) == 1
+        i = marks.index(Square::INITIAL_MARKER)
+        return line[i]
+      end
+    end
+    nil
+  end
+
+  def square_to_defend
+    Board::WINNING_LINES.each do |line|
+      marks = board.squares.values_at(*line).map(&:marker)
+      if marks.count(human.marker) == 2 && marks.count(Square::INITIAL_MARKER) == 1
+        i = marks.index(Square::INITIAL_MARKER)
+        return line[i]
+      end
+    end
+    nil
+  end
+
   def computer_moves
-    square = board.unmarked_keys.sample
+    square = if square_to_attack
+               square_to_attack
+             elsif square_to_defend
+               square_to_defend
+             elsif board.unmarked_keys.include?(5)
+               5
+             else
+               board.unmarked_keys.sample
+             end
     board[square] = computer.marker
   end
 
@@ -208,9 +255,9 @@ class TTTGame
 
     case board.winning_marker
     when human.marker
-      puts "You won!"
+      puts "#{human.name} won!"
     when computer.marker
-      puts "Computer won!"
+      puts "#{computer.name} won!"
     else
       puts "It's a tie!"
     end
