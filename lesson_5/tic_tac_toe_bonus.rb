@@ -88,29 +88,50 @@ end
 class Player
   attr_reader :marker
 
-  def initialize(marker)
-    @marker = marker
+  def initialize(type)
+    if type == :computer
+      @marker = "O"
+    else
+      choose_marker
+    end
+  end
+
+  def choose_marker
+    choice = nil
+    loop do
+      puts "Please type a character (not a space or O) to use as a marker."
+      choice = gets.chomp
+      break if choice.size == 1 && choice != " " && choice != "O"
+      puts "Please try again."
+    end
+    @marker = choice
   end
 end
 
 class TTTGame
-  HUMAN_MARKER = "X"
-  COMPUTER_MARKER = "O"
-  FIRST_TO_MOVE = HUMAN_MARKER
-
   attr_reader :board, :human, :computer
 
   def initialize
     @board = Board.new
-    @human = Player.new(HUMAN_MARKER)
-    @computer = Player.new(COMPUTER_MARKER)
-    @current_marker = FIRST_TO_MOVE
+    @human = Player.new(:human)
+    @computer = Player.new(:computer)
+  end
+
+  def set_first_player
+    choice = nil
+    loop do
+      puts "Would you like to go first? (y/n)"
+      choice = gets.chomp.downcase
+      break if %w(y n).include?(choice)
+      puts "You must answer y or n."
+    end
+    @current_marker = choice == "y" ? human.marker : computer.marker
   end
 
   def play
     clear
     display_welcome_message
-
+    set_first_player
     loop do
       display_board
 
@@ -145,7 +166,7 @@ class TTTGame
   end
 
   def human_turn?
-    @current_marker == HUMAN_MARKER
+    @current_marker == human.marker
   end
 
   def display_board
@@ -174,10 +195,10 @@ class TTTGame
   def current_player_moves
     if human_turn?
       human_moves
-      @current_marker = COMPUTER_MARKER
+      @current_marker = computer.marker
     else
       computer_moves
-      @current_marker = HUMAN_MARKER
+      @current_marker = human.marker
     end
   end
 
@@ -212,8 +233,8 @@ class TTTGame
 
   def reset
     board.reset
-    @current_marker = FIRST_TO_MOVE
     clear
+    set_first_player
   end
 
   def display_play_again_message
