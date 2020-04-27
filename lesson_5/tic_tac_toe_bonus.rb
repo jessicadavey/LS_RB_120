@@ -91,8 +91,6 @@ class Player
   def initialize(type)
     if type == :computer
       @marker = "O"
-    else
-      choose_marker
     end
   end
 
@@ -106,6 +104,7 @@ class Player
     end
     @marker = choice
   end
+
 end
 
 class TTTGame
@@ -131,6 +130,7 @@ class TTTGame
   def play
     clear
     display_welcome_message
+    human.choose_marker
     set_first_player
     loop do
       display_board
@@ -144,6 +144,7 @@ class TTTGame
       break unless play_again?
       reset
       display_play_again_message
+      set_first_player
     end
 
     display_goodbye_message
@@ -234,7 +235,6 @@ class TTTGame
   def reset
     board.reset
     clear
-    set_first_player
   end
 
   def display_play_again_message
