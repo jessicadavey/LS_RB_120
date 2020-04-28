@@ -119,6 +119,35 @@ class TTTGame
     @computer = Player.new('computer')
   end
 
+  def play
+    start_game
+    loop do
+      display_board
+      game_loop
+      display_result
+      break unless play_again?
+      game_reset
+    end
+
+    display_goodbye_message
+  end
+
+  private
+
+  def game_loop
+    loop do
+      current_player_moves
+      break if board.someone_won? || board.full?
+      clear_screen_and_display_board if human_turn?
+    end
+  end
+
+  def game_reset
+    reset
+    display_play_again_message
+    set_first_player
+  end
+
   def set_names
     n = ""
     loop do
@@ -142,31 +171,13 @@ class TTTGame
     @current_marker = choice == "y" ? human.marker : computer.marker
   end
 
-  def play
+  def start_game
     clear
     display_welcome_message
     set_names
     human.choose_marker
     set_first_player
-    loop do
-      display_board
-
-      loop do
-        current_player_moves
-        break if board.someone_won? || board.full?
-        clear_screen_and_display_board if human_turn?
-      end
-      display_result
-      break unless play_again?
-      reset
-      display_play_again_message
-      set_first_player
-    end
-
-    display_goodbye_message
   end
-
-  private
 
   def display_welcome_message
     puts "Welcome to Tic Tac Toe!"
