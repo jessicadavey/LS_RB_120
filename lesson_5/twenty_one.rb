@@ -7,16 +7,45 @@ class Player
     @hand = []
   end
 
-  def hit
+  def show_hand
+    puts hand.map(&:join).join("  ")
+  end
+
+  def hit(deck)
+    puts "You chose to hit."
+    take_card(deck)
   end
 
   def stay
+    puts "You chose to stay."
+  end
+
+  def take_card(deck)
+    hand << deck.deal
   end
 
   def busted?
+    total > 21
   end
 
+  def get_values
+    @hand.map(&:first).map do |value|
+      if %w(J Q K).include?(value) then 10
+      elsif value == "A" then 11
+      else value
+      end
+    end
+  end
+  
   def total
+    aces_to_handle = @hand.map(&:first).count("A")
+    sum = get_values.sum
+    loop do
+      break if sum < 21 || aces_to_handle == 0
+      sum -= 10
+      aces_to_handle -= 1
+    end
+    sum
   end
 end
 
@@ -27,7 +56,12 @@ class Dealer
     @hand = []
   end
 
-  def deal
+  def show_first_card
+    hand.first.join
+  end
+
+  def take_card(deck)
+    hand << deck.deal
   end
 
   def hit
@@ -37,6 +71,7 @@ class Dealer
   end
 
   def busted?
+    true
   end
 
   def total
@@ -89,25 +124,30 @@ class Game
 
   def deal_cards
     2.times do 
-      player.hand << deck.deal
-      dealer.hand << deck.deal
+      player.take_card(deck)
+      dealer.take_card(deck)
     end
   end
 
   def show_initial_cards
     puts "Your cards:" 
-    puts player.hand.map(&:join).join("  ")
+    player.show_hand
     puts "Dealer shows:"
-    puts dealer.hand.first.join
+    puts dealer.show_first_card
   end
 
   def player_turn
-    answer = ask_player
-    if answer == "h"
-      hit
-    elsif answer == "s"
-      stay
+    loop do
+      answer = ask_player
+      break if answer == "s"
+      player.hit(deck)
+      player.show_hand
+      next unless player.busted?
+      puts "You busted!  Game over!"
+      return
     end
+      player.stay
+      player.show_hand
   end
 
   def ask_player
@@ -119,14 +159,6 @@ class Game
       puts "You must choose h or s."
     end
     answer
-  end
-
-  def hit
-    puts "You chose to hit."
-  end
-
-  def stay
-    puts "You chose to stay."
   end
 
   private

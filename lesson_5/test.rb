@@ -1,17 +1,27 @@
-SPADE = "\xE2\x99\xA0"
-HEART = "\xE2\x99\xA1"
-DIAMOND = "\xE2\x99\xA2"
-CLUB = "\xE2\x99\xA3"
+require 'pry'
 
-SUITS = [SPADE, HEART, DIAMOND, CLUB]
-VALUES = (2..10).to_a + %w(J Q K A)
+def get_values(cards)
+  cards.map(&:first).map do |value|
+    if %w(J Q K).include?(value) then 10
+    elsif value == "A" then 11
+    else value
+    end
+  end
+end
 
-DECK_OF_CARDS = VALUES.product(SUITS).map(&:join)
+def total(cards)
+  aces_to_handle = cards.map(&:first).count("A")
+  sum = get_values(cards).sum
+  loop do
+    break if sum < 21 || aces_to_handle == 0
+    sum -= 10
+    aces_to_handle -= 1
+  end
+  sum
+end
 
-p DECK_OF_CARDS.size
-
-hand = [[6, "+"], ["A", "*"]]
-
-hand = hand.map(&:join).join("  ")
-
-puts hand
+p total([["Q", "♣"], [5, "♡"], [3, "♡"], [4, "♣"]]) == 22
+p total([[10, "♡"], ["A", "♣"], ["K", "♢"], [5, "♢"], ["A", "♠"]]) == 27
+p total([[4, "♢"], [6, "♣"], ["A", "♣"], [8, "♢"]]) == 19
+p total([[4, "♣"], [2, "♢"], ["A", "♡"]]) == 17
+p total([["A", "♣"], ["A", "♢"], [3, "♢"], [9, "♠"]]) == 14
