@@ -1,3 +1,5 @@
+require 'pry'
+
 class Player
   attr_accessor :hand
 
@@ -45,7 +47,15 @@ class Participant
 end
 
 class Deck
-  DECK_OF_CARDS = (1..52).to_a# all 52 cards
+  SPADE = "\xE2\x99\xA0"
+  HEART = "\xE2\x99\xA1"
+  DIAMOND = "\xE2\x99\xA2"
+  CLUB = "\xE2\x99\xA3"
+
+  SUITS = [SPADE, HEART, DIAMOND, CLUB]
+  VALUES = (2..10).to_a + %w(J Q K A)
+
+  DECK_OF_CARDS = VALUES.product(SUITS)
 
   def initialize
     @cards = DECK_OF_CARDS.shuffle
@@ -53,11 +63,6 @@ class Deck
 
   def deal
     @cards.pop
-  end
-end
-
-class Card
-  def initialize
   end
 end
 
@@ -70,11 +75,16 @@ class Game
   end
 
   def start
+    display_welcome_message
     deal_cards
     show_initial_cards
-    # player_turn
+    player_turn
     # dealer_turn
     # show_result
+  end
+
+  def display_welcome_message
+    puts " #{Deck::SPADE} #{Deck::DIAMOND} Welcome to 21! #{Deck::HEART} #{Deck::CLUB}"
   end
 
   def deal_cards
@@ -85,8 +95,38 @@ class Game
   end
 
   def show_initial_cards
-    p player.hand
-    p dealer.hand
+    puts "Your cards:" 
+    puts player.hand.map(&:join).join("  ")
+    puts "Dealer shows:"
+    puts dealer.hand.first.join
+  end
+
+  def player_turn
+    answer = ask_player
+    if answer == "h"
+      hit
+    elsif answer == "s"
+      stay
+    end
+  end
+
+  def ask_player
+    answer = nil
+    loop do
+      puts "Hit (h) or Stay (s)?"
+      answer = gets.chomp.downcase
+      break if %w(h s).include? answer
+      puts "You must choose h or s."
+    end
+    answer
+  end
+
+  def hit
+    puts "You chose to hit."
+  end
+
+  def stay
+    puts "You chose to stay."
   end
 
   private
