@@ -1,17 +1,16 @@
-squares = {1=>" ", 2=>"O", 3=>"X", 4=>" ", 5=>"O", 6=>" ", 7=>" ", 8=>"O", 9=>"O"}
-
-
-
-WINNING_LINES = [[1, 2, 3], [4, 5, 6], [7, 8, 9]] + # rows
-[[1, 4, 7], [2, 5, 8], [3, 6, 9]] + # cols
-[[1, 5, 9], [3, 5, 7]]              # diagonals
-
-def winning_marker(squares)
-  WINNING_LINES.each do |line|
-    marker = squares[line[0]]
-    return marker if squares.values_at(*line).all?(marker) && marker != " "
+def joinor(arr, delimiter = ", ", conjunction = "or")
+  if arr.size > 2
+    arr.map.with_index { |x, i| i == arr.size - 1 ? "#{conjunction} #{x}" : x }
+       .join(delimiter)
+  elsif arr.size == 2
+    "#{arr.first} #{conjunction} #{arr.last}"
+  else
+    arr.first.to_s
   end
-  nil
 end
 
-p winning_marker(squares)
+p joinor([1, 2, 3, 4, 5, 6, 7, 8, 9])
+p joinor([1, 2]) == "1 or 2"
+p joinor([1, 2, 3]) == "1, 2, or 3"
+p joinor([1, 2, 3], '; ') == "1; 2; or 3"
+p joinor([1, 2, 3], ', ', 'and') == "1, 2, and 3"
