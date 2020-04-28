@@ -12,7 +12,7 @@ class Board
     reset
   end
 
-  # rubocop:disable Metrics/AbcSize
+  # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
   def draw
     puts "     |     |"
     puts "  #{@squares[1]}  |  #{@squares[2]}  |  #{@squares[3]}"
@@ -26,7 +26,7 @@ class Board
     puts "  #{@squares[7]}  |  #{@squares[8]}  |  #{@squares[9]}"
     puts "     |     |"
   end
-  # rubocop:enable Metrics/AbcSize
+  # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
 
   def []=(key, marker)
     @squares[key].marker = marker
@@ -93,10 +93,9 @@ class Player
   attr_reader :marker, :name
 
   def initialize(type = nil)
-    if type == 'computer'
-      @marker = "O"
-      @name = ["Hal 9000", "Deep Thought", "C-3PO", "V-Ger", "Holly"].sample
-    end
+    return unless type == 'computer'
+    @marker = "O"
+    @name = ["Hal 9000", "Deep Thought", "C-3PO", "V-Ger", "Holly"].sample
   end
 
   def choose_marker
