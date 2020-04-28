@@ -59,6 +59,11 @@ class Dealer < Participant
   def show_first_card
     hand.first.join
   end
+
+  def show_hand
+    puts "Dealer cards:"
+    super
+  end
 end
 
 class Deck
@@ -151,17 +156,13 @@ class Game
       break if dealer.total >= 17
       dealer.hit(deck)
       next unless dealer.busted?
-      puts "Dealer cards:"
       dealer.show_hand
       puts "Dealer busted!  You win!"
     end
   end
 
   def show_result
-    puts "Dealer cards:"
     dealer.show_hand
-    puts "Player cards:"
-    player.show_hand
     puts "Dealer has #{dealer.total}, Player has #{player.total}."
     if dealer.total > player.total
       puts "Dealer wins!  You lose!"
