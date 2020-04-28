@@ -23,7 +23,7 @@ class Participant
     total > 21
   end
 
-  def get_values
+  def values
     @hand.map(&:first).map do |value|
       if %w(J Q K).include?(value) then 10
       elsif value == "A" then 11
@@ -31,10 +31,10 @@ class Participant
       end
     end
   end
-  
+
   def total
     aces_to_handle = @hand.map(&:first).count("A")
-    sum = get_values.sum
+    sum = values.sum
     loop do
       break if sum < 21 || aces_to_handle == 0
       sum -= 10
@@ -52,6 +52,7 @@ class Player < Participant
 
   def stay
     puts "You chose to stay."
+    show_hand
   end
 end
 
@@ -87,7 +88,6 @@ class Deck
 end
 
 class Game
-
   def initialize
     @deck = Deck.new
     @player = Player.new
@@ -105,7 +105,8 @@ class Game
   end
 
   def display_welcome_message
-    puts " #{Deck::SPADE} #{Deck::DIAMOND} Welcome to 21! #{Deck::HEART} #{Deck::CLUB}"
+    puts "#{Deck::SPADE} #{Deck::DIAMOND} Welcome to 21!"\
+         "#{Deck::HEART} #{Deck::CLUB}"
   end
 
   def display_goodbye_message
@@ -113,14 +114,14 @@ class Game
   end
 
   def deal_cards
-    2.times do 
+    2.times do
       player.take_card(deck)
       dealer.take_card(deck)
     end
   end
 
   def show_initial_cards
-    puts "Your cards:" 
+    puts "Your cards:"
     player.show_hand
     puts "Dealer shows:"
     puts dealer.show_first_card
@@ -136,8 +137,7 @@ class Game
       puts "You busted! Game over!"
       return
     end
-      player.stay
-      player.show_hand
+    player.stay
   end
 
   def ask_player
@@ -161,16 +161,20 @@ class Game
     end
   end
 
+  def result_message
+    if dealer.total > player.total
+      "Dealer wins!  You lose!"
+    elsif player.total > dealer.total
+      "You win!  Dealer loses!"
+    else
+      "It's a tie!"
+    end
+  end
+
   def show_result
     dealer.show_hand
     puts "Dealer has #{dealer.total}, Player has #{player.total}."
-    if dealer.total > player.total
-      puts "Dealer wins!  You lose!"
-    elsif player.total > dealer.total
-      puts "You win!  Dealer loses!"
-    else
-      puts "It's a tie!"
-    end
+    puts result_message
   end
 
   private
