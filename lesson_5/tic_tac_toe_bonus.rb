@@ -90,11 +90,13 @@ class Square
 end
 
 class Player
-  attr_reader :marker
-  attr_accessor :name
+  attr_reader :marker, :name
 
   def initialize(type = nil)
-    @marker = "O" if type == 'computer'
+    if type == 'computer'
+      @marker = "O"
+      @name = ["Hal 9000", "Deep Thought", "C-3PO", "V-Ger", "Holly"].sample
+    end
   end
 
   def choose_marker
@@ -107,6 +109,17 @@ class Player
       puts "Please try again."
     end
     @marker = choice
+  end
+
+  def set_name
+    n = ""
+    loop do
+      puts "What is your name?"
+      n = gets.chomp
+      break unless n.empty?
+      puts "You must enter a name."
+    end
+    @name = n
   end
 end
 
@@ -134,30 +147,21 @@ class TTTGame
 
   private
 
-  def game_loop
-    loop do
-      current_player_moves
-      break if board.someone_won? || board.full?
-      clear_screen_and_display_board if human_turn?
-    end
-  end
-
-  def game_reset
-    reset
-    display_play_again_message
+  def start_game
+    clear
+    display_welcome_message
+    human.set_name
+    human.choose_marker
     set_first_player
   end
 
-  def set_names
-    n = ""
-    loop do
-      puts "What is your name?"
-      n = gets.chomp
-      break unless n.empty?
-      puts "You must enter a name."
-    end
-    human.name = n
-    computer.name = "C-3PO"
+  def clear
+    system 'clear'
+  end
+
+  def display_welcome_message
+    puts "Welcome to Tic Tac Toe!"
+    puts ""
   end
 
   def set_first_player
@@ -171,38 +175,34 @@ class TTTGame
     @current_marker = choice == "y" ? human.marker : computer.marker
   end
 
-  def start_game
-    clear
-    display_welcome_message
-    set_names
-    human.choose_marker
-    set_first_player
-  end
-
-  def display_welcome_message
-    puts "Welcome to Tic Tac Toe!"
-    puts ""
-  end
-
-  def display_goodbye_message
-    puts "Thanks for playing Tic Tac Toe! Goodbye!"
-  end
-
-  def clear_screen_and_display_board
-    clear
-    display_board
-  end
-
-  def human_turn?
-    @current_marker == human.marker
-  end
-
   def display_board
     puts "#{human.name} is a #{human.marker}. "\
          "#{computer.name} is a #{computer.marker}."
     puts ""
     board.draw
     puts ""
+  end
+
+  def game_loop
+    loop do
+      current_player_moves
+      break if board.someone_won? || board.full?
+      clear_screen_and_display_board if human_turn?
+    end
+  end
+
+  def current_player_moves
+    if human_turn?
+      human_moves
+      @current_marker = computer.marker
+    else
+      computer_moves
+      @current_marker = human.marker
+    end
+  end
+
+  def human_turn?
+    @current_marker == human.marker
   end
 
   def human_moves
@@ -216,8 +216,17 @@ class TTTGame
     board[square] = human.marker
   end
 
-  def two_in_a_row?(line, marker)
-    line.count(marker) == 2 && line.count(Square::INITIAL_MARKER) == 1
+  def computer_moves
+    square = if square_to_attack
+               square_to_attack
+             elsif square_to_defend
+               square_to_defend
+             elsif board.unmarked_keys.include?(5)
+               5
+             else
+               board.unmarked_keys.sample
+             end
+    board[square] = computer.marker
   end
 
   def square_to_attack
@@ -242,27 +251,13 @@ class TTTGame
     nil
   end
 
-  def computer_moves
-    square = if square_to_attack
-               square_to_attack
-             elsif square_to_defend
-               square_to_defend
-             elsif board.unmarked_keys.include?(5)
-               5
-             else
-               board.unmarked_keys.sample
-             end
-    board[square] = computer.marker
+  def two_in_a_row?(line, marker)
+    line.count(marker) == 2 && line.count(Square::INITIAL_MARKER) == 1
   end
 
-  def current_player_moves
-    if human_turn?
-      human_moves
-      @current_marker = computer.marker
-    else
-      computer_moves
-      @current_marker = human.marker
-    end
+  def clear_screen_and_display_board
+    clear
+    display_board
   end
 
   def display_result
@@ -290,8 +285,10 @@ class TTTGame
     answer == 'y'
   end
 
-  def clear
-    system 'clear'
+  def game_reset
+    reset
+    display_play_again_message
+    set_first_player
   end
 
   def reset
@@ -302,6 +299,10 @@ class TTTGame
   def display_play_again_message
     puts "Let's play again!"
     puts ""
+  end
+
+  def display_goodbye_message
+    puts "Thanks for playing Tic Tac Toe! Goodbye!"
   end
 end
 
