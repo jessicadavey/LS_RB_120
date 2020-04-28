@@ -216,10 +216,14 @@ class TTTGame
     board[square] = human.marker
   end
 
+  def two_in_a_row?(line, marker)
+    line.count(marker) == 2 && line.count(Square::INITIAL_MARKER) == 1
+  end
+
   def square_to_attack
     Board::WINNING_LINES.each do |line|
       marks = board.squares.values_at(*line).map(&:marker)
-      if marks.count(computer.marker) == 2 && marks.count(Square::INITIAL_MARKER) == 1
+      if two_in_a_row?(marks, computer.marker)
         i = marks.index(Square::INITIAL_MARKER)
         return line[i]
       end
@@ -230,7 +234,7 @@ class TTTGame
   def square_to_defend
     Board::WINNING_LINES.each do |line|
       marks = board.squares.values_at(*line).map(&:marker)
-      if marks.count(human.marker) == 2 && marks.count(Square::INITIAL_MARKER) == 1
+      if two_in_a_row?(marks, human.marker)
         i = marks.index(Square::INITIAL_MARKER)
         return line[i]
       end
