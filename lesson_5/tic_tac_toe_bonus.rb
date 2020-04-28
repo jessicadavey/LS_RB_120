@@ -91,30 +91,33 @@ end
 
 class Player
   attr_reader :marker, :name
+  COMPUTER_NAME = ["Hal 9000", "Deep Thought", "C-3PO", "V-Ger", "Holly"].sample
+  COMPUTER_MARKER = ["O", "X"].sample
 
   def initialize(type = nil)
     return unless type == 'computer'
-    @marker = "O"
-    @name = ["Hal 9000", "Deep Thought", "C-3PO", "V-Ger", "Holly"].sample
+    @marker = COMPUTER_MARKER
+    @name = COMPUTER_NAME
   end
 
   def choose_marker
     choice = nil
     puts "Welcome #{name}!"
     loop do
-      puts "Please type a character (not a space or O) to use as a marker."
+      puts "#{COMPUTER_NAME} chose #{COMPUTER_MARKER}."
+      puts "Please type another character (not a space) to use as a marker."
       choice = gets.chomp
-      break if choice.size == 1 && choice != " " && choice != "O"
+      break if choice.size == 1 && choice != " " && choice != COMPUTER_MARKER
       puts "Please try again."
     end
     @marker = choice
   end
 
-  def set_name
+  def choose_name
     n = ""
     loop do
       puts "What is your name?"
-      n = gets.chomp
+      n = gets.chomp.strip
       break unless n.empty?
       puts "You must enter a name."
     end
@@ -149,7 +152,7 @@ class TTTGame
   def start_game
     clear
     display_welcome_message
-    human.set_name
+    human.choose_name
     human.choose_marker
     set_first_player
   end
