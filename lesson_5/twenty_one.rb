@@ -1,6 +1,6 @@
 require 'pry'
 
-class Player
+class Participant
   attr_accessor :hand
 
   def initialize
@@ -12,12 +12,7 @@ class Player
   end
 
   def hit(deck)
-    puts "You chose to hit."
     take_card(deck)
-  end
-
-  def stay
-    puts "You chose to stay."
   end
 
   def take_card(deck)
@@ -49,36 +44,21 @@ class Player
   end
 end
 
-class Dealer
-  attr_accessor :hand
-
-  def initialize
-    @hand = []
-  end
-
-  def show_first_card
-    hand.first.join
-  end
-
-  def take_card(deck)
-    hand << deck.deal
-  end
-
-  def hit
+class Player < Participant
+  def hit(deck)
+    puts "You chose to hit."
+    super(deck)
   end
 
   def stay
-  end
-
-  def busted?
-    true
-  end
-
-  def total
+    puts "You chose to stay."
   end
 end
 
-class Participant
+class Dealer < Participant
+  def show_first_card
+    hand.first.join
+  end
 end
 
 class Deck
@@ -114,12 +94,17 @@ class Game
     deal_cards
     show_initial_cards
     player_turn
-    # dealer_turn
-    # show_result
+    dealer_turn
+    show_result unless dealer.busted? || player.busted?
+    display_goodbye_message
   end
 
   def display_welcome_message
     puts " #{Deck::SPADE} #{Deck::DIAMOND} Welcome to 21! #{Deck::HEART} #{Deck::CLUB}"
+  end
+
+  def display_goodbye_message
+    puts "Thank you for playing 21.  Goodbye!"
   end
 
   def deal_cards
@@ -143,7 +128,7 @@ class Game
       player.hit(deck)
       player.show_hand
       next unless player.busted?
-      puts "You busted!  Game over!"
+      puts "You busted! Game over!"
       return
     end
       player.stay
@@ -159,6 +144,32 @@ class Game
       puts "You must choose h or s."
     end
     answer
+  end
+
+  def dealer_turn
+    loop do
+      break if dealer.total >= 17
+      dealer.hit(deck)
+      next unless dealer.busted?
+      puts "Dealer cards:"
+      dealer.show_hand
+      puts "Dealer busted!  You win!"
+    end
+  end
+
+  def show_result
+    puts "Dealer cards:"
+    dealer.show_hand
+    puts "Player cards:"
+    player.show_hand
+    puts "Dealer has #{dealer.total}, Player has #{player.total}."
+    if dealer.total > player.total
+      puts "Dealer wins!  You lose!"
+    elsif player.total > dealer.total
+      puts "You win!  Dealer loses!"
+    else
+      puts "It's a tie!"
+    end
   end
 
   private
