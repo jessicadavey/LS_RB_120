@@ -1,5 +1,3 @@
-require 'pry'
-
 class Board
   attr_reader :squares
 
@@ -126,8 +124,6 @@ class Player
 end
 
 class TTTGame
-  attr_reader :board, :human, :computer
-
   def initialize
     @board = Board.new
     @human = Player.new
@@ -148,6 +144,8 @@ class TTTGame
   end
 
   private
+
+  attr_reader :board, :human, :computer
 
   def start_game
     clear
@@ -211,11 +209,11 @@ class TTTGame
     puts "Choose a square (#{joinor(board.unmarked_keys)}):"
     square = nil
     loop do
-      square = gets.chomp.to_i
-      break if board.unmarked_keys.include?(square)
+      square = gets.chomp
+      break if board.unmarked_keys.map(&:to_s).include?(square)
       puts "Sorry, that's not a valid choice."
     end
-    board[square] = human.marker
+    board[square.to_i] = human.marker
   end
 
   def joinor(arr, delimiter = ", ", conj = "or")
