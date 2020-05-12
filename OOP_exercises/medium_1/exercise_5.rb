@@ -13,7 +13,7 @@ class Minilang
       if integer?(str)
         str.to_i
       else
-        str.downcase.to_sym
+        str
       end
     end
   end
@@ -55,8 +55,8 @@ class Minilang
     self.register = register - stack.pop
   end
 
-  def invalid?(sym)
-    ![:add, :sub, :div, :mod, :push, :pop, :mult, :print].include?(sym)
+  def invalid?(str)
+    !["ADD", "SUB", "DIV", "MOD", "PUSH", "POP", "MULT", "PRINT"].include?(str)
   end
 
   def eval
@@ -65,9 +65,9 @@ class Minilang
         if instruction.class == Integer
           self.register = instruction
         elsif invalid?(instruction)
-          raise("Invalid token: #{instruction.to_s.upcase}")
+          raise("Invalid token: #{instruction}")
         else
-          self.send(instruction)
+          self.send(instruction.downcase.to_sym)
         end
       end
     rescue RuntimeError => e
