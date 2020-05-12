@@ -1,7 +1,6 @@
 require 'pry'
 
 class Minilang
-
   def initialize(string)
     @instructions = prepare(string)
     @stack = []
@@ -62,12 +61,9 @@ class Minilang
   def eval
     begin
       instructions.each do |instruction|
-        if instruction.class == Integer
-          self.register = instruction
-        elsif invalid?(instruction)
-          raise("Invalid token: #{instruction}")
-        else
-          self.send(instruction.downcase.to_sym)
+        if instruction.class == Integer then self.register = instruction
+        elsif invalid?(instruction) then raise("Invalid token: #{instruction}")
+        else send(instruction.downcase.to_sym)
         end
       end
     rescue RuntimeError => e
